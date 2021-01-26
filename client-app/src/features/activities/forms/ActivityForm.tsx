@@ -1,21 +1,19 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useContext, useState } from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
-import { IActivity } from "./../../../app/models/activity";
 import { v4 as uuid } from "uuid";
+import { observer } from "mobx-react-lite";
+import ActivityStore from "../../../stores/activityStore";
 
-interface IPros {
-  setEditMode: (editMode: boolean) => void;
-  activity: IActivity;
-  createActivity: (activity: IActivity) => void;
-  editActivity: (activity: IActivity) => void;
-}
+const ActivityForm: React.FC = () => {
+  const activityStore = useContext(ActivityStore);
+  const {
+    selectedActivity: initialFormState,
+    createActivity,
+    submitting,
+    editActivity,
+    cancelFormOpen,
+  } = activityStore;
 
-const ActivityForm: React.FC<IPros> = ({
-  setEditMode,
-  activity: initialFormState,
-  createActivity,
-  editActivity,
-}) => {
   const InitializeForm = () => {
     if (initialFormState) return initialFormState;
     else {
@@ -92,15 +90,16 @@ const ActivityForm: React.FC<IPros> = ({
           placeholder="Venue"
           value={activity.venue}
         />
-        <Button floated="right" positive content="Submit" />
         <Button
-          onClick={() => setEditMode(false)}
+          loading={submitting}
           floated="right"
-          content="Cancel"
+          positive
+          content="Submit"
         />
+        <Button onClick={cancelFormOpen} floated="right" content="Cancel" />
       </Form>
     </Segment>
   );
 };
 
-export default ActivityForm;
+export default observer(ActivityForm);
